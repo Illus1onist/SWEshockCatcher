@@ -1,0 +1,12 @@
+* text=auto
+
+# Shell scripts must stay LF when cloned on Linux/WSL
+*.sh text eol=lf
+Allrun text eol=lf
+Allclean text eol=lf
+
+# Source and scripts
+*.C text eol=lf
+*.H text eol=lf
+*.py text eol=lf
+*.tex text eol=lf

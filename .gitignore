@@ -1,0 +1,27 @@
+# OpenFOAM generated data
+**/constant/polyMesh/
+**/[0-9]*/
+!**/0/
+**/postProcessing/
+**/log.*
+**/uniform/
+**/functionObjects/
+**/results/
+
+# OpenFOAM / compiler build artifacts
+**/Make/linux64*/
+**/*.o
+**/*.dep
+
+# Python
+**/__pycache__/
+**/*.pyc
+
+# LaTeX auxiliary files
+report/*.aux
+report/*.log
+report/*.out
+report/*.toc
+
+# local development copies
+*.orig

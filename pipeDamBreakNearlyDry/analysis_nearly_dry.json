@@ -1,0 +1,17 @@
+{
+  "t": 16.5,
+  "hR": 0.001,
+  "h2_exact": 0.06682978341618492,
+  "u2_exact": 4.644801090428531,
+  "cs_exact": 4.715358835713267,
+  "h2_num": 0.066810625,
+  "front_x": 77.7189400953653,
+  "front_speed_num": 4.710238793658503,
+  "front_width_m": 1.1757677936919748,
+  "front_width_cells": 5.878838968459874,
+  "h_min": 0.001,
+  "h_max": 1.0,
+  "negative_cells": 0,
+  "crash_time": 16.725,
+  "crash_reason": "FOAM_SIGFPE in Foam::sqrt (h < 0 in the height equation)"
+}
