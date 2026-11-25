@@ -1,4 +1,4 @@
-﻿# SWEshockFoam
+# SWEshockFoam
 
 2D shallow-water solver written as an OpenFOAM application.  The same
 face loop runs on a 1D strip (two empty directions) and on a 2D mesh
@@ -173,6 +173,7 @@ wmake
 
 cd SWEshockFoam/pipe1D
 ./Allrun            # blockMesh + setFields + SWEshockFoam
+./Allclean          # remove generated time dirs, logs and polyMesh
 ```
 
 The other cases are run the same way:
@@ -191,9 +192,9 @@ cd SWEshockFoam/radial2D && ./Allrun      # 400 x 400, ~10-15 min
 - `analyze_radial2d.py` вЂ” 2D radial average, symmetry, mass, 1D-vs-2D
   comparison and `radial_1d_vs_2d.png`; writes `radial2d_summary.json`.
 - `convergence/` вЂ” grid-convergence study for the wet dam break on
-  `N = 128, 256, 512, 1024, 2048` cells: `run_convergence.sh`,
-  `analyze_convergence.py`, `convergence.json`,
-  `convergence.png`.
+  `N = 128, 256, 512, 1024, 2048` cells: `Allrun` (sweep + analysis),
+  `Allclean`, `run_convergence.sh`, `analyze_convergence.py`,
+  `convergence.json`, `convergence.png`.
 
 Both analysis scripts read the OpenFOAM ascii fields directly and need
 `numpy` + `matplotlib`.  The progress report built from these results is

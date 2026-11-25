@@ -78,38 +78,138 @@ radialDamBreak/           native 2D baseline + Python radial prototype
 PLAN.md                   four-step project plan and status
 ```
 
-## Build and run
+## Software environment and dependencies
 
-A working OpenFOAM 2406 environment is assumed.  Build the solver:
+The repository was tested with:
+
+- Ubuntu 24.04.3 LTS under WSL2 on Windows;
+- OpenFOAM v2406 (OpenCFD), including `wmake`, `blockMesh`, `setFields`,
+  `foamListTimes`, and `shallowWaterFoam`;
+- g++ 13.3.0 (C++17);
+- Python 3.12.3, numpy 1.26.4, matplotlib 3.6.3 (analysis);
+- TeX Live 2024 / pdfTeX 3.141592653-2.6-1.40.26 (report only).
+
+The custom solver requires OpenFOAM v2406 and a C++17 compiler.  The native
+Step-1 baseline cases (`pipeDamBreak*`, `radialDamBreak`) additionally require
+`shallowWaterFoam`; the `SWEshockFoam` cases do not use it.  The analysis
+scripts need Python 3 with `numpy` and `matplotlib`; the report needs a LaTeX
+installation with the packages used in `report.tex`.  The code targets
+OpenFOAM v2406; other versions may need small Make/API adjustments.
+
+## Reproduction
+
+All commands below are run from the repository root unless stated otherwise.
+
+1. **Clone the repository**
+
+```sh
+git clone https://github.com/Illus1onist/SWEshockCatcher.git
+cd SWEshockCatcher
+```
+
+2. **Source OpenFOAM** (the exact path depends on the installation)
+
+```sh
+source /usr/lib/openfoam/openfoam2406/etc/bashrc
+# or: source "$WM_PROJECT_DIR/etc/bashrc"
+```
+
+3. **Build the custom solver**
 
 ```sh
 cd solvers/SWEshockFoam
 wmake
+cd ../..
 ```
 
-Run a custom-solver case (this creates the mesh and the initial fields):
+4. **Run the custom-solver cases**
 
 ```sh
 cd SWEshockFoam/pipe1D
 ./Allrun
+
+cd ../pipe1D_dry
+./Allrun
+
+cd ../pipe1D_nearly
+./Allrun
+
+cd ../radial1D
+./Allrun
+
+cd ../radial2D
+./Allrun            # 400 x 400, about 10-15 min
+cd ..
 ```
 
-The other cases are analogous:
+Each `Allrun` performs `blockMesh` -> `setFields` -> `SWEshockFoam`, so no
+mesh files or initial-condition files need to be committed.  The 1D cases
+finish in seconds; `radial2D` takes roughly 10-15 min on one core.
+
+5. **Run the grid-convergence study**
 
 ```sh
-cd SWEshockFoam/pipe1D_dry && ./Allrun
-cd SWEshockFoam/pipe1D_nearly && ./Allrun
-cd SWEshockFoam/radial1D && ./Allrun
-cd SWEshockFoam/radial2D && ./Allrun      # about 10-15 min
+cd convergence
+./Allrun            # run_convergence.sh + analyze_convergence.py
+cd ..
 ```
 
-The grid-convergence study is reproduced with:
+6. **Produce the analysis figures and summaries**
 
 ```sh
-cd SWEshockFoam/convergence
-./run_convergence.sh
-python3 analyze_convergence.py
+python3 analyze_all.py
+python3 analyze_radial2d.py
 ```
+
+Expected outputs: time directories (`0.1`, `0.2`, ...) with `h` and `hU`;
+`log.blockMesh`, `log.setFields`, `log.SWEshockFoam`; `all_cases.png`,
+`all_summary.json`, `radial_1d_vs_2d.png`, `radial2d_summary.json`; and in
+`convergence/`, `convergence.json` and `convergence.png`.
+
+7. **Build the report (optional)**
+
+```sh
+cd ../report
+pdflatex report.tex
+pdflatex report.tex
+```
+
+### Automation and cleanup
+
+Every custom-solver case has an `Allrun` and an `Allclean`.  `Allclean` uses
+OpenFOAM's `CleanFunctions` (`cleanCase`) to remove time directories, logs,
+`constant/polyMesh`, and `postProcessing`; it does not remove `0/`.  The
+`convergence` case also removes its generated `results/` directory, while
+keeping the committed `convergence.json` and `convergence.png`.
+
+```sh
+cd SWEshockFoam/pipe1D && ./Allclean
+```
+
+The native Step-1 baseline cases (`pipeDamBreak*`, `radialDamBreak`) have
+their own `Allrun`/`Allclean` and require `shallowWaterFoam`.  They are
+included for the Step-1 part of the report; some are long (the long pipe runs
+to 50 s of physical time), so read the case README before launching all of
+them.
+
+From the repository root, for example:
+
+```sh
+cd SWEshockFoam/pipe1D && ./Allclean
+```
+
+### Report-to-case mapping
+
+| Report item | Reproduced by |
+|---|---|
+| Wet Stoker profile/table (Fig. 2, Table 6) | `SWEshockFoam/pipe1D` + `analyze_all.py` |
+| Dry Ritter profile (Fig. 2) | `SWEshockFoam/pipe1D_dry` + `analyze_all.py` |
+| Nearly-dry Stoker profile/table (Fig. 2, Table 6) | `SWEshockFoam/pipe1D_nearly` + `analyze_all.py` |
+| Grid convergence (Fig. 3, Table 7) | `SWEshockFoam/convergence/Allrun` |
+| 1D radial evolution (Fig. 4) | `SWEshockFoam/radial1D` + `analyze_all.py` |
+| 2D radial map and 1D/2D comparison (Fig. 5, Table 8) | `SWEshockFoam/radial2D` + `analyze_radial2d.py` |
+| Step-1 native OpenFOAM baseline | `pipeDamBreak*`, `radialDamBreak` |
+| Report PDF/TeX | `report/` |
 
 ## Analysis and report
 

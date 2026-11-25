@@ -1,0 +1,5 @@
+#!/bin/sh
+cd "${0%/*}" || exit 1
+
+./run_convergence.sh
+python3 analyze_convergence.py
